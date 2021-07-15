@@ -272,7 +272,8 @@ public abstract class ASN1Tag<T extends ASN1Object> {
     public int hashCode() {
         //return Objects.hash(asn1TagClass, getTag(), asn1Encoding);
         int out = asn1TagClass.hashCode() / 3;
-        out += getTag() / 3;
+        // Maybe don't divide this one because worry more about numbers hashing to the same number
+        out += getTag();// / 3;
         out += asn1Encoding.hashCode() / 3;
         return out;
     }
