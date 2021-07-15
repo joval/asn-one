@@ -30,14 +30,14 @@ import com.hierynomus.asn1.types.string.ASN1OctetString;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
+//import java.util.Objects;
 
 import static com.hierynomus.asn1.types.ASN1TagClass.Universal;
 import static java.lang.String.format;
 import static java.util.EnumSet.of;
 
 public abstract class ASN1Tag<T extends ASN1Object> {
-    private static Map<Integer, ASN1Tag<?>> tags = new HashMap<>();
+    private static Map<Integer, ASN1Tag<?>> tags = new HashMap<Integer, ASN1Tag<?>>();
 
     public static final ASN1Tag<ASN1Boolean> BOOLEAN = new ASN1Tag<ASN1Boolean>(Universal, 0x01, ASN1Encoding.Primitive) {
         @Override
@@ -270,7 +270,11 @@ public abstract class ASN1Tag<T extends ASN1Object> {
 
     @Override
     public int hashCode() {
-        return Objects.hash(asn1TagClass, getTag(), asn1Encoding);
+        //return Objects.hash(asn1TagClass, getTag(), asn1Encoding);
+        int out = asn1TagClass.hashCode() / 3;
+        out += getTag() / 3;
+        out += asn1Encoding.hashCode() / 3;
+        return out;
     }
 
     @Override

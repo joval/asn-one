@@ -45,12 +45,12 @@ public class ASN1Sequence extends ASN1Object<List<ASN1Object>> implements ASN1Co
 
     @Override
     public List<ASN1Object> getValue() {
-        return new ArrayList<>(objects);
+        return new ArrayList<ASN1Object>(objects);
     }
 
     @Override
     public Iterator<ASN1Object> iterator() {
-        return new ArrayList<>(objects).iterator();
+        return new ArrayList<ASN1Object>(objects).iterator();
     }
 
     public int size() {
@@ -69,13 +69,23 @@ public class ASN1Sequence extends ASN1Object<List<ASN1Object>> implements ASN1Co
 
         @Override
         public ASN1Sequence parse(ASN1Tag<ASN1Sequence> asn1Tag, byte[] value) throws ASN1ParseException {
-            List<ASN1Object> list = new ArrayList<>();
-            try (ASN1InputStream stream = new ASN1InputStream(decoder, value)) {
+            List<ASN1Object> list = new ArrayList<ASN1Object>();
+            ASN1InputStream stream = null;
+            try {
+                stream = new ASN1InputStream(decoder, value);
                 for (ASN1Object asn1Object : stream) {
                     list.add(asn1Object);
                 }
-            } catch (IOException e) {
-                throw new ASN1ParseException(e, "Unable to parse the ASN.1 SEQUENCE contents.");
+            //} catch (IOException e) {
+            //    throw new ASN1ParseException(e, "Unable to parse the ASN.1 SEQUENCE contents.");
+            } finally {
+                try {
+                    if (stream != null) {
+                        stream.close();
+                    }
+                } catch (IOException e) {
+                    throw new ASN1ParseException(e, "Unable to parse the ASN.1 SEQUENCE contents.");
+                }
             }
             return new ASN1Sequence(list, value);
         }

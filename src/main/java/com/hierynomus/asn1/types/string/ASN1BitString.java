@@ -34,13 +34,33 @@ public class ASN1BitString extends ASN1String<BitSet> {
         this.unusedBits = unusedBits;
     }
 
+    public static byte[] toByteArray(BitSet bits) {
+        byte[] bytes = new byte[(bits.length() + 7) / 8];
+        for (int i=0; i<bits.length(); i++) {
+            if (bits.get(i)) {
+                bytes[i/8] |= 1<<(i%8);
+            }
+        }
+        return bytes;
+    }
+
     public ASN1BitString(BitSet bitSet) {
-        super(ASN1Tag.BIT_STRING, bitSet.toByteArray());
+        //super(ASN1Tag.BIT_STRING, bitSet.toByteArray());
+        super(ASN1Tag.BIT_STRING, toByteArray(bitSet));
     }
 
     @Override
     public BitSet getValue() {
-        return BitSet.valueOf(valueBytes);
+        //return BitSet.valueOf(valueBytes);
+        //Docs: BitSet.valueOf(bytes).get(n) == ((bytes[n/8] & (1<<(n%8))) != 0)}
+        int nbits = valueBytes.length*8;
+        BitSet bits = new BitSet(nbits);
+        for (int n = 0; n < nbits; n++) {
+            if ((valueBytes[n/8] & (1<<(n%8))) != 0) {
+                bits.set(n);
+            }
+        }
+        return bits;
     }
 
     /**

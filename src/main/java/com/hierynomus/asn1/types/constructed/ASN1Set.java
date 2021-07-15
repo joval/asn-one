@@ -39,16 +39,16 @@ public class ASN1Set extends ASN1Object<Set<ASN1Object>> implements ASN1Construc
 
     public ASN1Set(Set<ASN1Object> objects) {
         super(ASN1Tag.SET);
-        this.objects = new HashSet<>(objects);
+        this.objects = new HashSet<ASN1Object>(objects);
     }
 
     @Override
     public Set<ASN1Object> getValue() {
-        return new HashSet<>(objects);
+        return new HashSet<ASN1Object>(objects);
     }
 
     public Iterator<ASN1Object> iterator() {
-        return new HashSet<>(objects).iterator();
+        return new HashSet<ASN1Object>(objects).iterator();
     }
 
     public static class Parser extends ASN1Parser<ASN1Set> {
@@ -58,13 +58,23 @@ public class ASN1Set extends ASN1Object<Set<ASN1Object>> implements ASN1Construc
 
         @Override
         public ASN1Set parse(ASN1Tag<ASN1Set> asn1Tag, byte[] value) throws ASN1ParseException {
-            HashSet<ASN1Object> asn1Objects = new HashSet<>();
-            try (ASN1InputStream stream = new ASN1InputStream(decoder, value)) {
+            HashSet<ASN1Object> asn1Objects = new HashSet<ASN1Object>();
+            ASN1InputStream stream = null;
+            try {
+                stream = new ASN1InputStream(decoder, value);
                 for (ASN1Object asn1Object : stream) {
                     asn1Objects.add(asn1Object);
                 }
-            } catch (IOException e) {
-                throw new ASN1ParseException(e, "Could not parse ASN.1 SET contents.");
+            //} catch (IOException e) {
+            //    throw new ASN1ParseException(e, "Could not parse ASN.1 SET contents.");
+            } finally {
+                if (stream != null) {
+                    try {
+                        stream.close();
+                    } catch (IOException e) {
+                        throw new ASN1ParseException(e, "Could not parse ASN.1 SET contents.");
+                    }
+                }
             }
 
             return new ASN1Set(asn1Objects, value);
